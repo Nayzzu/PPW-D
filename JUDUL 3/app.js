@@ -29,7 +29,7 @@ const alertBox = document.getElementById("alert-box");
 const tabelBody = document.getElementById("tabel-body-mahasiswa");
 const totalBadge = document.getElementById("total-mahasiswa-badge");
 const totalInfo = document.getElementById("total-mahasiswa-info");
-/*
+
 // Seleksi Elemen Formulir Tambah Mahasiswa
 const formTambah = document.getElementById("form-tambah-mahasiswa");
 const inputNim = document.getElementById("nim");
@@ -37,13 +37,13 @@ const inputNama = document.getElementById("nama");
 const selectProdi = document.getElementById("program_studi");
 const inputAngkatan = document.getElementById("angkatan");
 const inputEmail = document.getElementById("email");
-*/
+const inputSearch = document.getElementById("search-input");
 
 // 3. Fungsi Menampilkan Notifikasi Alert Interaktif (Percobaan 3-1).
 function showAlert(message, type = "success") {
-  if (!alertbox) return;
+  if (!alertBox) return;
   alertBox.textContent = message;
-  alertBox.className = `alrt-box alert-${type} show`;
+  alertBox.className = `alert-box alert-${type} show`;
 
   setTimeout(() => {
     alertBox.className = "alert-box";
@@ -103,10 +103,10 @@ function renderTable(data = dataMahasiswa) {
 // 6. Validasi Form Sisi Klien Menggunakan Regular Expression (Percobaan 3-3).
 function validateForm(npm, nama, prodi, angkatan, email) {
   if (!/^[0-9]{8,12}$/.test(npm)) {
-    return { isValid: false, message: "NPM harus brupa 8-12 digit angka. " };
+    return { isValid: false, message: "NPM harus berupa 8-12 digit angka. " };
   }
 
-  if (dataMahasiswa.som((mhs) => mhs.npm === npm)) {
+  if (dataMahasiswa.some((mhs) => mhs.npm === npm)) {
     return {
       isValid: false,
       message: `NPM ${npm} sudah terdaftar dalam sistem SIMA.`,
@@ -115,7 +115,7 @@ function validateForm(npm, nama, prodi, angkatan, email) {
 
   if (nama.trim().length < 3) {
     return {
-      isValid: fals,
+      isValid: false,
       message: "Nama lengkap minimal harus terdiri dari 3 karakter. ",
     };
   }
@@ -138,7 +138,7 @@ function validateForm(npm, nama, prodi, angkatan, email) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return {
       isValid: false,
-      message: "Format alamat email tidak valid (contoh: nama@domain.ac.id. ",
+      message: "Format alamat email tidak valid (contoh: nama@domain.ac.id). ",
     };
   }
 
@@ -169,17 +169,19 @@ if (formTambah) {
 
     // Percobaan 3-4 Langkah 7
     const mahasiswaBaru = {
-      nim,
-      nama,
+      npm: npm,
+      nama: nama,
       program_studi: prodi,
       angkatan: parseInt(angkatan, 10),
-      email,
+      email: email,
     };
+    dataMahasiswa.push(mahasiswaBaru);
+
     // Percobaan 3-4 Langkah 8
     renderTable(dataMahasiswa);
     formTambah.reset();
     showAlert(
-      `Data mahasiswa ${nama} (${nim}) berhasil ditambahkan ke sistem!`,
+      `Data mahasiswa ${nama} (${npm}) berhasil ditambahkan ke sistem!`,
       "success",
     );
   });
@@ -190,18 +192,18 @@ if (formTambah) {
 function hapusMahasiswa(npm) {
   const mhs = dataMahasiswa.find((item) => item.npm === npm);
   if (!mhs) return;
-}
 
-const kondirmasi = confirm(
-  `Apakah Anda yakin ingin menghapus data mahasiswa: \n${mhs.nama} (${nim})?`,
-);
-if (konfirmasi) {
-  dataMahasiswa = dataMahasiswa.filter((item) => item.nim !== nim);
-  renderTable(dataMahasiswa);
-  showAlert(
-    `data mahasiswa dengan NIM ${nim} berhasil di hapus dari sistem. `,
-    "info",
+  const konfirmasi = confirm(
+    `Apakah Anda yakin ingin menghapus data mahasiswa: \n${mhs.nama} (${mhs.npm})?`,
   );
+  if (konfirmasi) {
+    dataMahasiswa = dataMahasiswa.filter((item) => item.npm !== npm);
+    renderTable(dataMahasiswa);
+    showAlert(
+      `Data mahasiswa dengan NPM ${npm} berhasil dihapus dari sistem. `,
+      "info",
+    );
+  }
 }
 
 // 9. Fitur Pencarian Langsung Real-Time / Live Search (Percobaan 3-5)
@@ -214,7 +216,7 @@ if (inputSearch) {
     } else {
       const hasilFilter = dataMahasiswa.filter(
         (mhs) =>
-          mhs.nim.toLowerCase().includes(keyword) ||
+          mhs.npm.toLowerCase().includes(keyword) ||
           mhs.nama.toLowerCase().includes(keyword) ||
           mhs.program_studi.toLowerCase().includes(keyword),
       );
@@ -225,7 +227,7 @@ if (inputSearch) {
 
 // Inisialisasi saat DOM selesai dimuat
 
-document.addEventListener("DOMContemtLoaded", function () {
-  showAlert("Selamat datang DI Aplikasi SIMA", "info");
+document.addEventListener("DOMContentLoaded", function () {
+  showAlert("Selamat datang di Aplikasi SIMA", "info");
   renderTable(dataMahasiswa);
 });
